@@ -1,0 +1,65 @@
+name: 'Nexus Sync'
+description: 'Sync artifacts to Nexus'
+inputs:
+  username:
+    description: 'Nexus username'
+    required: true
+  password:
+    description: 'Nexus password'
+    required: true
+  create:
+    description: 'Automatically create repository, defaults to "false".'
+    required: false
+  staging-profile-name:
+    description: 'Nexus Staging Profile Name'
+    required: true
+  staging-repo-id:
+    description: 'Nexus Staging Repo id'
+    required: false
+  close:
+    description: 'Automatically close repository, defaults to "false".'
+    required: false
+  drop-if-failure:
+    description: 'Automatically drop repository, defaults to "false".'
+    required: false
+  close-timeout:
+    description:
+      'How long in seconds to wait slow nexus close operation, defaults to "600"'
+    required: false
+  release:
+    description: 'Automatically release repository, defaults to "false".'
+    required: false
+  release-auto-drop:
+    description: 'Drop repo after release, defaults to "true".'
+    required: false
+  release-timeout:
+    description:
+      'How long in seconds to wait slow nexus release operation, defaults to
+      "600"'
+    required: false
+  generate-checksums:
+    description: 'Generate checksums, defaults to "false"'
+    required: false
+  generate-checksums-config:
+    description: 'Config to generate checksum files.'
+    required: false
+  url:
+    description: 'Base Nexus url, defaults to "https://oss.sonatype.org"'
+    required: false
+  upload:
+    description: 'Upload files, defaults to "false".'
+    required: false
+  upload-parallel:
+    description: 'How many files are uploaded parallel, defaults to "1"'
+    required: false
+  dir:
+    description: 'Base directory for files to sync, defaults to "nexus"'
+    required: false
+  nexus-timeout:
+    description:
+      'How long in seconds to wait http requests to nexus, defaults to "0"
+      meaning no timeout'
+    required: false
+runs:
+  using: node20
+  main: dist/index.js
