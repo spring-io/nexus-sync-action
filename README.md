@@ -48,7 +48,7 @@ on:
 jobs:
   sync:
     runs-on: ubuntu-latest
-    - uses: jvalkeal/atestn@main
+    - uses: spring-io/nexus-sync-action@main
       with:
         username: ${{ secrets.NEXUS_USERNAME }}
         password: ${{ secrets.NEXUS_PASSWORD }}
