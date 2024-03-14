@@ -20,7 +20,7 @@ A GitHub action for deploying to a Maven Central.
 | `release-timeout`           | How long in seconds to wait slow nexus release operation, defaults to "600"            | Optional |
 | `generate-checksums`        | Generate checksums, defaults to "false"                                                | Optional |
 | `generate-checksums-config` | Config to generate checksum files.                                                     | Optional |
-| `url`                       | Base Nexus url, defaults to "https://oss.sonatype.org"                                 | Optional |
+| `url`                       | Base Nexus url, defaults to "https://s01.oss.sonatype.org"                             | Optional |
 | `upload`                    | Upload files, defaults to "false".                                                     | Optional |
 | `upload-parallel`           | How many files are uploaded parallel, defaults to "1"                                  | Optional |
 | `nexus-timeout`             | How long in seconds to wait http requests to nexus, defaults to "0" meaning no timeout | Optional |
