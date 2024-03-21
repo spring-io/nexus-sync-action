@@ -1,6 +1,7 @@
 import fs from 'fs'
 import * as https from 'https'
 import axios, { AxiosInstance } from 'axios'
+import axiosRetry from 'axios-retry'
 import {
   NexusServer,
   PromoteFinishRequest,
@@ -38,6 +39,13 @@ export class Nexus2Client {
         Accept: 'application/json'
       },
       httpsAgent: new https.Agent({})
+    })
+    axiosRetry(this.instance, {
+      onRetry: (retryCount, error) => {
+        logInfo(
+          `Retry request count=${retryCount} status=${error.response?.status} path=${error.request?.path}`
+        )
+      }
     })
   }
 
@@ -120,6 +128,8 @@ export class Nexus2Client {
 
   /**
    * Promote a staging repo and returns PromotePromoteResponse as a Promise.
+   * We retry request 16 times with increasing delay to help how
+   * nexus may return 500 after successfull close for next minute or so.
    *
    * @param data promote promote request
    */
@@ -130,7 +140,21 @@ export class Nexus2Client {
       this.instance
         .post(
           `${this.nexusServer.url}/service/local/staging/bulk/promote`,
-          data
+          data,
+          {
+            'axios-retry': {
+              retries: 10,
+              retryDelay: retryCount => {
+                return retryCount * 1000
+              },
+              retryCondition(error) {
+                if (error.request.method === 'POST') {
+                  return true
+                }
+                return false
+              }
+            }
+          }
         )
         .then(r => {
           resolve(r.data as BulkPromoteResponse)

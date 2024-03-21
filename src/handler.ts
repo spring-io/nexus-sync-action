@@ -97,12 +97,6 @@ export async function handle(actionOptions: ActionOptions): Promise<void> {
   // need to release
   if (handlerState.needRelease && handlerState.stagingRepoId) {
     startGroup('Staging Repo Release')
-    // looks like we get 500 if release is done too quickly
-    // after close so instead of implementing full retry, just sleep
-    // a bit before going into release request
-    if (handlerState.needClose) {
-      await delayPromise(10000)
-    }
     try {
       await releaseStagingRepo(
         nexusClient,
