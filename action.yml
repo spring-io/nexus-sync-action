@@ -44,7 +44,7 @@ inputs:
     description: 'Config to generate checksum files.'
     required: false
   url:
-    description: 'Base Nexus url, defaults to "https://oss.sonatype.org"'
+    description: 'Base Nexus url, defaults to "https://s01.oss.sonatype.org"'
     required: false
   upload:
     description: 'Upload files, defaults to "false".'
