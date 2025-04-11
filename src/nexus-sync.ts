@@ -11,8 +11,16 @@ import { numberValue } from './utils'
 
 export async function run() {
   try {
-    const username = inputRequired('username')
-    const password = inputRequired('password')
+    const username = inputNotRequired('username') || undefined
+    const password = inputNotRequired('password') || undefined
+    const token = inputNotRequired('token') || undefined
+    if (!token) {
+      if (!username && !password) {
+        throw new Error(
+          'Either username and password or token needs to be set.'
+        )
+      }
+    }
     const create = inputNotRequired('create') === 'true' ? true : false
     const stagingProfileName = inputRequired('staging-profile-name')
     const stagingRepoId = inputNotRequired('staging-repo-id') || undefined
@@ -60,6 +68,7 @@ export async function run() {
       nexusServer: {
         username,
         password,
+        token,
         url,
         timeout: nexusTimeout * 1000
       },

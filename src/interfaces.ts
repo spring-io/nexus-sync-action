@@ -94,8 +94,9 @@ export interface PromoteDropResponse extends ErrorResponse {}
  */
 export interface NexusServer {
   url: string
-  username: string
-  password: string
+  username?: string
+  password?: string
+  token?: string
   timeout: number
 }
 

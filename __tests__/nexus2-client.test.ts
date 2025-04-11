@@ -28,6 +28,34 @@ describe('nexus2-client tests', () => {
     expect(id).toBe('2e32338b1a152')
   })
 
+  it('should be basic authenticated', async () => {
+    nock('http://localhost:8082', {
+      reqheaders: {
+        authorization: value => value.startsWith('Basic ')
+      }
+    })
+      .get('/nexus/service/local/staging/profiles')
+      .reply(200, STAGING_PROFILES_1)
+    const id = await client.getStagingProfileId('test')
+  })
+
+  it('should be token authenticated', async () => {
+    nock('http://localhost:8082', {
+      reqheaders: {
+        authorization: value =>
+          value.startsWith('Bearer ') && value.endsWith('abcdef0')
+      }
+    })
+      .get('/nexus/service/local/staging/profiles')
+      .reply(200, STAGING_PROFILES_1)
+    const other = new Nexus2Client({
+      url: 'http://localhost:8082/nexus',
+      token: 'abcdef0',
+      timeout: 0
+    })
+    const id = await other.getStagingProfileId('test')
+  })
+
   it('should return repository', async () => {
     nock('http://localhost:8082')
       .get('/nexus/service/local/staging/repository/fake')

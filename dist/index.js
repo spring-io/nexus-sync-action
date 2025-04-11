@@ -28751,8 +28751,14 @@ const logging_1 = __nccwpck_require__(1517);
 const utils_1 = __nccwpck_require__(1314);
 async function run() {
     try {
-        const username = inputRequired('username');
-        const password = inputRequired('password');
+        const username = inputNotRequired('username') || undefined;
+        const password = inputNotRequired('password') || undefined;
+        const token = inputNotRequired('token') || undefined;
+        if (!token) {
+            if (!username && !password) {
+                throw new Error('Either username and password or token needs to be set.');
+            }
+        }
         const create = inputNotRequired('create') === 'true' ? true : false;
         const stagingProfileName = inputRequired('staging-profile-name');
         const stagingRepoId = inputNotRequired('staging-repo-id') || undefined;
@@ -28791,6 +28797,7 @@ async function run() {
             nexusServer: {
                 username,
                 password,
+                token,
                 url,
                 timeout: nexusTimeout * 1000
             },
@@ -29030,20 +29037,21 @@ class Nexus2Client {
     instance;
     constructor(nexusServer) {
         this.nexusServer = nexusServer;
-        this.instance = axios_1.default.create({
-            auth: {
-                username: nexusServer.username,
-                password: nexusServer.password
-            },
+        const config = {
             timeout: nexusServer.timeout,
             maxBodyLength: Infinity,
             maxContentLength: Infinity,
             headers: {
                 'Content-Type': 'application/json',
-                Accept: 'application/json'
+                Accept: 'application/json',
+                Authorization: `Bearer ${nexusServer.token}`
             },
             httpsAgent: new https.Agent({})
-        });
+        };
+        if (nexusServer.username && nexusServer.password) {
+            config.headers.Authorization = `Basic ${Buffer.from(`${nexusServer.username}:${nexusServer.password}`).toString('base64')}`;
+        }
+        this.instance = axios_1.default.create(config);
         (0, axios_retry_1.default)(this.instance, {
             onRetry: (retryCount, error) => {
                 (0, logging_1.logInfo)(`Retry request count=${retryCount} status=${error.response?.status} path=${error.request?.path}`);

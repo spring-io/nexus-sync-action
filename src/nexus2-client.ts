@@ -26,20 +26,23 @@ export class Nexus2Client {
   private instance: AxiosInstance
 
   constructor(private nexusServer: NexusServer) {
-    this.instance = axios.create({
-      auth: {
-        username: nexusServer.username,
-        password: nexusServer.password
-      },
+    const config = {
       timeout: nexusServer.timeout,
       maxBodyLength: Infinity,
       maxContentLength: Infinity,
       headers: {
         'Content-Type': 'application/json',
-        Accept: 'application/json'
+        Accept: 'application/json',
+        Authorization: `Bearer ${nexusServer.token}`
       },
       httpsAgent: new https.Agent({})
-    })
+    }
+    if (nexusServer.username && nexusServer.password) {
+      config.headers.Authorization = `Basic ${Buffer.from(
+        `${nexusServer.username}:${nexusServer.password}`
+      ).toString('base64')}`
+    }
+    this.instance = axios.create(config)
     axiosRetry(this.instance, {
       onRetry: (retryCount, error) => {
         logInfo(

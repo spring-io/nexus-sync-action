@@ -33,7 +33,7 @@ describe('nexus-sync tests', () => {
   }, 300000)
 
   beforeEach(() => {
-    inputs = {}
+    inputs = { username: 'username', password: 'password' }
     nock.cleanAll()
     createStagingRepoSpy = jest
       .spyOn(nexusUtils, 'createStagingRepo')
