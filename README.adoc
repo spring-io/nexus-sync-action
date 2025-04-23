@@ -1,0 +1,60 @@
+= Nexus Sync Action
+
+A https://docs.github.com/en/actions[GitHub action] for publishing a local directory containing artifacts to the https://central.sonatype.org/register/central-portal/[Sonatype Central Portal].
+
+== Overview
+
+This action can be used to deploy artifacts to the Sonatype Central Portal.
+
+== Configuration
+
+=== Required Inputs
+
+- `token-name`: Token name for authentication with the Central Portal
+- `token`: Token for authentication with the Central Portal
+
+=== Optional Inputs
+
+- `base-uri`: Base URL of the Sonatype Central Portal.
+Defaults to `https://central.sonatype.com`.
+- `publishing-type`: https://central.sonatype.org/publish/publish-portal-api/#uploading-a-deployment-bundle[Publishing type] of the artifacts.
+Can be `automatic` or `user_managed`.
+Defaults to `automatic`.
+- `dir`: Directory containing the artifacts to deploy.
+Defaults to `nexus`.
+- `drop-on-failure`: Whether the deployment should automatically be dropped on failure.
+Defaults to `true`.
+- `timeout`: Maximum duration to wait for a deployment to complete.
+Defaults to `600s`.
+- `sleep-between-retries`: Duration between deployment status retries.
+Defaults to `10s`.
+
+=== Minimal Example
+
+[source,yaml,indent=0]
+----
+steps:
+  - name: Deploy
+    uses: spring-io/nexus-sync-action@main
+    with:
+      token-name: ${{ secrets.SONATYPE_TOKEN_NAME }}
+      token: ${{ secrets.SONATYPE_TOKEN }}
+----
+
+=== Debugging
+
+The action uses the `ACTIONS_STEP_DEBUG` environment variable to enable additional debug logging.
+This can be configured by passing through the value of the `ACTIONS_STEP_DEBUG` secret that GitHub Actions sets when re-running with debug logging enabled:
+
+[source,yaml,indent=0]
+----
+steps:
+  - name: Deploy
+    uses: spring-io/nexus-sync-action@main
+    env:
+      ACTION_STEPS_DEBUG: ${{ secrets.ACTIONS_STEP_DEBUG }}
+----
+
+== License
+
+Nexus Sync Action is Open Source software released under the https://www.apache.org/licenses/LICENSE-2.0.html[Apache 2.0 license].

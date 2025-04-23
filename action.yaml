@@ -1,0 +1,41 @@
+name: 'Nexus Sync'
+description: 'Publishes artifacts on Sonatype Central Portal'
+inputs:
+  token-name:
+    description: 'Token name for authentication with the Central Portal'
+    required: true
+  token:
+    description: 'Token for authentication with the Central Portal'
+    required: true
+  publishing-type:
+    description: 'Publishing type of the artifacts'
+    required: false
+    default: 'automatic'
+  dir:
+    description: 'Directory containing the artifacts to deploy'
+    required: false
+    default: 'nexus'
+  drop-on-failure:
+    description: 'Whether the deployment should automatically be dropped on failure.'
+    required: false
+    default: 'true'
+  timeout:
+    description: 'Maximum duration to wait for a deployment to complete'
+    required: false
+    default: '600s'
+  sleep-between-retries:
+    description: 'Duration between deployment status retries'
+    required: false
+    default: '10s'
+
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+    - --centralportal.directory=${{ inputs.dir }}
+    - --centralportal.token.name=${{ inputs.token-name }}
+    - --centralportal.token.value=${{ inputs.token }}
+    - --centralportal.deployment.publishing-type=${{ inputs.publishing-type }}
+    - --centralportal.deployment.drop-on-failure=${{ inputs.drop-on-failure }}
+    - --centralportal.deployment.timeout=${{ inputs.timeout }}
+    - --centralportal.deployment.sleep-between-retries=${{ inputs.sleep-between-retries }}
