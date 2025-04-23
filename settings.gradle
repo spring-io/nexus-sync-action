@@ -1,1 +1,3 @@
 rootProject.name = 'nexus-sync-action'
+
+include 'action', 'sonatype-portal-mock'
