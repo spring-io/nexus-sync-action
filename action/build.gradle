@@ -2,7 +2,7 @@ plugins {
     id "checkstyle"
     id "io.spring.javaformat" version "$javaFormatVersion"
     id "java"
-    id "org.springframework.boot" version "3.4.4"
+    id "org.springframework.boot" version "$springBootVersion"
 }
 
 repositories {
@@ -16,7 +16,7 @@ java {
 }
 
 checkstyle {
-    toolVersion = "10.13.0"
+    toolVersion = "$checkstyleToolVersion"
 }
 
 def integrationTest = sourceSets.create("integrationTest") {
