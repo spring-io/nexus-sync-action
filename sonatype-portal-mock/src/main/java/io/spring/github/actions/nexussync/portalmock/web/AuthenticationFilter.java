@@ -24,7 +24,10 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 /**
@@ -34,6 +37,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
  * @author Moritz Halbritter
  */
 class AuthenticationFilter extends OncePerRequestFilter {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(AuthenticationFilter.class);
 
 	private final String tokenName;
 
@@ -47,24 +52,31 @@ class AuthenticationFilter extends OncePerRequestFilter {
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
-		String header = request.getHeader("Authorization");
+		String header = request.getHeader(HttpHeaders.AUTHORIZATION);
 		if (header == null) {
+			LOGGER.debug("No {} header found", HttpHeaders.AUTHORIZATION);
 			response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
 			response.getWriter().println("Header 'Authorization' not found");
 			return;
 		}
 		if (!header.startsWith("Bearer ")) {
+			LOGGER.debug("Invalid Authorization header found. Header is '{}'", header);
 			response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
 			response.getWriter().println("Header 'Authorization' doesn't start with 'Bearer'");
 			return;
 		}
 		String token = header.substring("Bearer ".length());
+		LOGGER.debug("Found token '{}'", token);
 		String decoded = new String(Base64.getDecoder().decode(token), StandardCharsets.UTF_8);
-		if (!decoded.equals(this.tokenName + ":" + this.token)) {
+		LOGGER.debug("Found decoded token '{}'", decoded);
+		String expectedToken = this.tokenName + ":" + this.token;
+		if (!decoded.equals(expectedToken)) {
+			LOGGER.debug("Provided token '{}' does not match expected token '{}'", decoded, expectedToken);
 			response.sendError(HttpServletResponse.SC_FORBIDDEN);
 			response.getWriter().println("Incorrect token");
 			return;
 		}
+		LOGGER.debug("Valid token found, proceeding");
 		filterChain.doFilter(request, response);
 	}
 

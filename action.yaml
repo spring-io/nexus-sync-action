@@ -1,6 +1,10 @@
 name: 'Nexus Sync'
 description: 'Publishes artifacts on Sonatype Central Portal'
 inputs:
+  base-uri:
+    description: 'Token name for authentication with the Central Portal'
+    default: 'https://central.sonatype.com'
+    required: false
   token-name:
     description: 'Token name for authentication with the Central Portal'
     required: true
@@ -32,6 +36,7 @@ runs:
   using: 'docker'
   image: 'Dockerfile'
   args:
+    - --centralportal.base-uri=${{ inputs.base-uri }}
     - --centralportal.directory=${{ inputs.dir }}
     - --centralportal.token.name=${{ inputs.token-name }}
     - --centralportal.token.value=${{ inputs.token }}

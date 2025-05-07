@@ -20,6 +20,7 @@ import java.time.Duration;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
@@ -50,6 +51,7 @@ public class PortalMockProperties {
 	@Validated
 	public static class Deployment {
 
+		@NotNull
 		private Duration delayBetweenSteps = Duration.ZERO;
 
 		public Duration getDelayBetweenSteps() {

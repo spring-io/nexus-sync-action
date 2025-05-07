@@ -1,0 +1,36 @@
+name: Integration Test
+description: 'Integration tests the action'
+inputs:
+  sonatype-portal-mock-host:
+    description: 'Sonatype Portal Mock hostname'
+    required: true
+  sonatype-portal-mock-port:
+    description: 'Sonatype Portal Mock port'
+    required: true
+  token-name:
+    description: 'Token name'
+    required: true
+  token:
+    description: 'Token'
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: Check out action
+      uses: actions/checkout@v4
+    - name: Unzip artifacts to deploy
+      shell: bash
+      run: unzip integration-test/bundle.zip -d integration-test/bundle/
+    - name: Run action
+      uses: ./
+      with:
+        base-uri: 'http://${{ inputs.sonatype-portal-mock-host }}:${{ inputs.sonatype-portal-mock-port }}'
+        token-name: ${{ inputs.token-name }}
+        token: ${{ inputs.token }}
+        publishing-type: 'automatic'
+        dir: 'integration-test/bundle/'
+        sleep-between-retries: '1s'
+    - name: Download bundle
+      shell: bash
+      # This doesn't run in a actions container, so we have to use localhost to access the Sonatype portal mock
+      run: wget localhost:${{ inputs.sonatype-portal-mock-port }}/debug/published-deployments/0 -o bundle.zip
