@@ -1,0 +1,48 @@
+plugins {
+    id "checkstyle"
+    id "io.spring.javaformat" version "$javaFormatVersion"
+    id "java"
+    id "org.springframework.boot" version "$springBootVersion"
+}
+
+repositories {
+    mavenCentral()
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+checkstyle {
+    toolVersion = "$checkstyleToolVersion"
+}
+
+configurations {
+    checkstyle {
+        resolutionStrategy.capabilitiesResolution.withCapability("com.google.collections:google-collections") {
+            select("com.google.guava:guava:0")
+        }
+    }
+}
+
+dependencies {
+    checkstyle("com.puppycrawl.tools:checkstyle:${checkstyle.toolVersion}")
+    checkstyle("io.spring.javaformat:spring-javaformat-checkstyle:${javaFormatVersion}")
+
+    implementation(platform(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES))
+
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs = ["-parameters", "-Xlint:all"]
+}
