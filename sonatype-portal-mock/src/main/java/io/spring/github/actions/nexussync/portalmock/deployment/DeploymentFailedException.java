@@ -16,12 +16,17 @@
 
 package io.spring.github.actions.nexussync.portalmock.deployment;
 
+import java.io.Serial;
+
 /**
  * Is thrown if a deployment failed.
  *
  * @author Moritz Halbritter
  */
 class DeploymentFailedException extends RuntimeException {
+
+	@Serial
+	private static final long serialVersionUID = 1L;
 
 	DeploymentFailedException(String message) {
 		super(message);
