@@ -25,9 +25,9 @@ Defaults to `nexus`.
 - `drop-on-failure`: Whether the deployment should automatically be dropped on failure.
 Defaults to `true`.
 - `timeout`: Maximum duration to wait for a deployment to complete.
-Defaults to `600s`.
+Defaults to `30m`.
 - `sleep-between-retries`: Duration between deployment status retries.
-Defaults to `10s`.
+Defaults to `1m`.
 
 === Minimal Example
 

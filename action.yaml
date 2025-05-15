@@ -26,11 +26,11 @@ inputs:
   timeout:
     description: 'Maximum duration to wait for a deployment to complete'
     required: false
-    default: '600s'
+    default: '30m'
   sleep-between-retries:
     description: 'Duration between deployment status retries'
     required: false
-    default: '10s'
+    default: '1m'
 
 runs:
   using: 'docker'

@@ -133,9 +133,9 @@ public class NexusSyncProperties {
 
 		private boolean dropOnFailure = true;
 
-		private Duration timeout = Duration.ofSeconds(600);
+		private Duration timeout = Duration.ofMinutes(30);
 
-		private Duration sleepBetweenRetries = Duration.ofSeconds(10);
+		private Duration sleepBetweenRetries = Duration.ofMinutes(1);
 
 		public PublishingType getPublishingType() {
 			return this.publishingType;
