@@ -16,6 +16,7 @@
 
 package io.spring.github.actions.nexussync.sonatype;
 
+import java.io.Serial;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.time.Clock;
@@ -29,6 +30,8 @@ import io.spring.github.actions.nexussync.system.Logger;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.Assert;
@@ -166,13 +169,17 @@ class CentralPortalApiImpl implements CentralPortalApi {
 		public void awaitFinalStatus() {
 			long start = System.nanoTime();
 			while (true) {
-				Duration elapsed = Duration.ofNanos(System.nanoTime() - start);
-				if (elapsed.compareTo(this.timeout) > 0) {
-					throw new IllegalStateException(
-							"Timeout of '%s' reached while waiting for final status of deployment '%s'"
-								.formatted(this.timeout, this.deploymentId));
+				checkTimeout(start);
+				DeploymentStatusDto deploymentStatus;
+				try {
+					deploymentStatus = fetchDeploymentStatus();
 				}
-				DeploymentStatusDto deploymentStatus = fetchDeploymentStatus();
+				catch (DeploymentNotFoundException ex) {
+					// Sometimes Sonatype returns 404 for newly created deployments
+					this.logger.debug("Got 404 while checking status");
+					sleep();
+					continue;
+				}
 				Status status = Status.fromApi(deploymentStatus.deploymentState());
 				this.logger.debug("\tStatus: {}", status);
 				if (status.isFinal(this.publishingType)) {
@@ -180,6 +187,15 @@ class CentralPortalApiImpl implements CentralPortalApi {
 					return;
 				}
 				sleep();
+			}
+		}
+
+		private void checkTimeout(long start) {
+			Duration elapsed = Duration.ofNanos(System.nanoTime() - start);
+			if (elapsed.compareTo(this.timeout) > 0) {
+				throw new IllegalStateException(
+						"Timeout of '%s' reached while waiting for final status of deployment '%s'"
+							.formatted(this.timeout, this.deploymentId));
 			}
 		}
 
@@ -201,7 +217,14 @@ class CentralPortalApiImpl implements CentralPortalApi {
 			return this.restClient.post()
 				.uri("/api/v1/publisher/status?id={deploymentId}", this.deploymentId)
 				.retrieve()
+				.onStatus(this::is404, (res, req) -> {
+					throw new DeploymentNotFoundException();
+				})
 				.body(DeploymentStatusDto.class);
+		}
+
+		private boolean is404(HttpStatusCode status) {
+			return status.isSameCodeAs(HttpStatus.NOT_FOUND);
 		}
 
 		private void sleep() {
@@ -214,6 +237,13 @@ class CentralPortalApiImpl implements CentralPortalApi {
 		}
 
 		private record DeploymentStatusDto(String deploymentState, Map<Object, Object> errors) {
+		}
+
+		private static final class DeploymentNotFoundException extends RuntimeException {
+
+			@Serial
+			private static final long serialVersionUID = 1L;
+
 		}
 
 	}
