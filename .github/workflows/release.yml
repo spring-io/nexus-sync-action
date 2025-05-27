@@ -1,4 +1,6 @@
 name: Release
+permissions:
+  contents: read
 on:
   push:
     tags:
@@ -19,6 +21,8 @@ jobs:
       version: ${{ steps.build.outputs.version }}
   create-github-release:
     name: Create GitHub Release
+    permissions:
+      contents: write
     needs:
       - build
     runs-on: 'ubuntu-latest'
