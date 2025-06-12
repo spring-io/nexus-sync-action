@@ -1,4 +1,8 @@
-= Nexus Sync Action
+= Deprecation
+
+*This project is no longer maintained - use https://github.com/spring-io/central-publish-action instead!*
+
+== Nexus Sync Action
 
 A https://docs.github.com/en/actions[GitHub action] for publishing a local directory containing artifacts to the https://central.sonatype.org/register/central-portal/[Sonatype Central Portal].
 
